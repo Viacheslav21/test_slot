@@ -10,7 +10,7 @@ import kotlinx.android.synthetic.main.text_view_scrolling.view.*
 import java.util.*
 
 interface EventListener {
-    fun end(result: Int)
+    fun end(result: SlotView)
 }
 
 
@@ -21,17 +21,25 @@ class SlotView @JvmOverloads constructor(
     private var text: AppCompatTextView
     private var nextText: AppCompatTextView
 
-    var oldValue = 0
+    var finishValue: Int = 0
+    var previousWasFinished = false
+    private var circle = 1
+
+    private var number: Int
 
     init {
         val view = View.inflate(context, R.layout.text_view_scrolling, this)
         text = view.text_lbl
         nextText = view.next_text_lbl
+        number = Random().nextInt(9)
+        text.text = number.toString()
     }
 
-    /*companion object {
+    companion object {
         private const val ANIM_DURATION = 500L
-    }*/
+        private const val MIN_CIRCLES = 1
+    }
+
 
     private var eventListener: EventListener? = null
 
@@ -39,10 +47,14 @@ class SlotView @JvmOverloads constructor(
         this.eventListener = eventListener
     }
 
-    fun setRandomValue(number: Int, speed: Long) {
-        text.animate().translationY(-height.toFloat()).setDuration(speed).start()
-        nextText.translationY = nextText.height.toFloat()
-        nextText.animate().translationY(0F).setDuration(speed).setListener(object :
+    fun startLot() {
+        if (number >= 9) number = 0 else number++
+
+        text.animate().translationY(-height.toFloat()).setDuration(ANIM_DURATION).start() //ввверх
+
+        nextText.translationY = nextText.height.toFloat() // ставим ниже
+
+        nextText.animate().translationY(0F).setDuration(ANIM_DURATION).setListener(object :
             Animator.AnimatorListener {
             override fun onAnimationRepeat(animator: Animator) {
             }
@@ -50,36 +62,38 @@ class SlotView @JvmOverloads constructor(
             override fun onAnimationEnd(animator: Animator) {
                 setText(text, number)
                 text.translationY = 0F
+                if (circle > MIN_CIRCLES && previousWasFinished && finishValue == number) finishSlot()
+                else nextCircle()
 
-                if (oldValue != number) {
-                    setRandomValue(Random().nextInt(10), speed)
-                } else {
-                    oldValue = 0
-                    text.visibility = View.GONE
-                    setText(nextText, number)
-                    eventListener?.end(number)
-                }
             }
 
             override fun onAnimationCancel(animator: Animator) {
             }
 
             override fun onAnimationStart(animator: Animator) {
-                text.visibility = View.VISIBLE
             }
 
         })
     }
 
+    /*  Log.d("TAG_MY", "previousWasFinished = $previousWasFinished circle = $circle")
+                Log.d("TAG_MY", "finish value = $finishValue number = $number")*/
+
+    private fun nextCircle() {
+        circle++
+        startLot()
+    }
+
+    private fun finishSlot() {
+        finishValue = 0
+        circle = 0
+        setText(text, number)
+        eventListener?.end(this@SlotView)
+    }
+
     private fun setText(text: AppCompatTextView, value: Int) {
         text.text = value.toString()
         text.tag = value
-    }
-
-    fun getValue() = nextText.tag.toString().toInt()
-
-    fun setFinishValue(finishValue: Int) {
-        this.oldValue = finishValue
     }
 
 

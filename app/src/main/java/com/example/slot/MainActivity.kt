@@ -8,42 +8,52 @@ import java.util.*
 class MainActivity : AppCompatActivity(), EventListener {
 
 
-    var countDown = 0
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
 
+
         start_btn.setOnClickListener {
 
-            val random = Random().nextInt(500 - 300) + 300
+            val random = Random().nextInt(900) + 100
 
             val first = random / 100 % 10
             val second = random / 10 % 10
             val third = random % 10
 
-            generateRandom(one_lot, first)
+            generateRandom(first_lot, first)
+            first_lot.previousWasFinished = true
             generateRandom(second_lot, second)
             generateRandom(third_lot, third)
 
         }
 
-        one_lot.setEventListener(this)
+        first_lot.setEventListener(this)
         second_lot.setEventListener(this)
         third_lot.setEventListener(this)
 
     }
 
     private fun generateRandom(slotView: SlotView, finishValue: Int) {
-        slotView.setFinishValue(finishValue)
-        slotView.setRandomValue(0, (Random().nextInt(500 - 300) + 300).toLong())
-
+        slotView.finishValue = finishValue
+        slotView.startLot()
     }
 
-    override fun end(result: Int) {
-        if (result < 2) countDown++
-        else countDown = 0
+    override fun end(result: SlotView) {
+
+        if (result == first_lot) second_lot.previousWasFinished = true
+
+
+        if (result == second_lot) third_lot.previousWasFinished = true
+
+
+        if (result == third_lot) {
+            third_lot.previousWasFinished = false
+            second_lot.previousWasFinished = false
+
+        }
+
 
     }
 }
