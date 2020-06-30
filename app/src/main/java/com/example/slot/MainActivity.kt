@@ -37,21 +37,20 @@ class MainActivity : AppCompatActivity(), EventListener {
 
     private fun generateRandom(slotView: SlotView, finishValue: Int) {
         slotView.finishValue = finishValue
-        slotView.startLot()
+        slotView.startSlot()
     }
 
-    override fun end(result: SlotView) {
+    override fun end(slot: SlotView) {
 
-        if (result == first_lot) second_lot.previousWasFinished = true
-
-
-        if (result == second_lot) third_lot.previousWasFinished = true
+        if (slot == first_lot) second_lot.previousFinished()
 
 
-        if (result == third_lot) {
+        if (slot == second_lot)  third_lot.previousFinished()
+
+
+        if (slot == third_lot) {
             third_lot.previousWasFinished = false
             second_lot.previousWasFinished = false
-
         }
 
 

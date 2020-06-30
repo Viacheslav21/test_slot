@@ -10,7 +10,7 @@ import kotlinx.android.synthetic.main.text_view_scrolling.view.*
 import java.util.*
 
 interface EventListener {
-    fun end(result: SlotView)
+    fun end(slot: SlotView)
 }
 
 
@@ -23,9 +23,11 @@ class SlotView @JvmOverloads constructor(
 
     var finishValue: Int = 0
     var previousWasFinished = false
-    private var circle = 1
+    private var circle = 0
 
     private var number: Int
+
+    private var set = mutableSetOf<Int>()
 
     init {
         val view = View.inflate(context, R.layout.text_view_scrolling, this)
@@ -36,7 +38,7 @@ class SlotView @JvmOverloads constructor(
     }
 
     companion object {
-        private const val ANIM_DURATION = 500L
+        private const val ANIM_DURATION = 400L
         private const val MIN_CIRCLES = 1
     }
 
@@ -47,11 +49,14 @@ class SlotView @JvmOverloads constructor(
         this.eventListener = eventListener
     }
 
-    fun startLot() {
-        if (number >= 9) {
-            number = 0
-            circle ++
-        } else number++
+    fun startSlot() {
+
+        if (!set.contains(number)) set.add(number)
+        else circle++
+
+
+        if (number >= 9) number = 0
+        else number++
 
 
         text.animate().translationY(-height.toFloat()).setDuration(ANIM_DURATION).start()
@@ -66,8 +71,8 @@ class SlotView @JvmOverloads constructor(
             override fun onAnimationEnd(animator: Animator) {
                 setText(text, number)
                 text.translationY = 0F
-                if (circle > MIN_CIRCLES && previousWasFinished && finishValue == number) finishLot()
-                else startLot()
+                if (circle > MIN_CIRCLES && previousWasFinished && finishValue == number) finishSlot()
+                else startSlot()
 
             }
 
@@ -84,8 +89,9 @@ class SlotView @JvmOverloads constructor(
                 Log.d("TAG_MY", "finish value = $finishValue number = $number")*/
 
 
-    private fun finishLot() {
+    private fun finishSlot() {
         circle = 0
+        set.clear()
         setText(text, number)
         eventListener?.end(this@SlotView)
     }
@@ -93,6 +99,11 @@ class SlotView @JvmOverloads constructor(
     private fun setText(text: AppCompatTextView, value: Int) {
         text.text = value.toString()
         text.tag = value
+    }
+
+    fun previousFinished() {
+        previousWasFinished = true
+        set.clear()
     }
 
 
