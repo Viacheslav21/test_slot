@@ -27,7 +27,7 @@ class SlotView @JvmOverloads constructor(
 
     private var number: Int
 
-    private var set = mutableSetOf<Int>()
+    private var circleCounter = mutableSetOf<Int>()
 
     init {
         val view = View.inflate(context, R.layout.text_view_scrolling, this)
@@ -51,7 +51,7 @@ class SlotView @JvmOverloads constructor(
 
     fun startSlot() {
 
-        if (!set.contains(number)) set.add(number)
+        if (!circleCounter.contains(number)) circleCounter.add(number)
         else circle++
 
 
@@ -90,8 +90,7 @@ class SlotView @JvmOverloads constructor(
 
 
     private fun finishSlot() {
-        circle = 0
-        set.clear()
+        clearCircle()
         setText(text, number)
         eventListener?.end(this@SlotView)
     }
@@ -102,8 +101,13 @@ class SlotView @JvmOverloads constructor(
     }
 
     fun previousFinished() {
+        clearCircle()
         previousWasFinished = true
-        set.clear()
+    }
+
+    private fun clearCircle() {
+        circle = 0
+        circleCounter.clear()
     }
 
 
