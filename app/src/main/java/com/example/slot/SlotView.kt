@@ -48,11 +48,15 @@ class SlotView @JvmOverloads constructor(
     }
 
     fun startLot() {
-        if (number >= 9) number = 0 else number++
+        if (number >= 9) {
+            number = 0
+            circle ++
+        } else number++
 
-        text.animate().translationY(-height.toFloat()).setDuration(ANIM_DURATION).start() //ввверх
 
-        nextText.translationY = nextText.height.toFloat() // ставим ниже
+        text.animate().translationY(-height.toFloat()).setDuration(ANIM_DURATION).start()
+
+        nextText.translationY = nextText.height.toFloat()
 
         nextText.animate().translationY(0F).setDuration(ANIM_DURATION).setListener(object :
             Animator.AnimatorListener {
@@ -62,8 +66,8 @@ class SlotView @JvmOverloads constructor(
             override fun onAnimationEnd(animator: Animator) {
                 setText(text, number)
                 text.translationY = 0F
-                if (circle > MIN_CIRCLES && previousWasFinished && finishValue == number) finishSlot()
-                else nextCircle()
+                if (circle > MIN_CIRCLES && previousWasFinished && finishValue == number) finishLot()
+                else startLot()
 
             }
 
@@ -79,13 +83,8 @@ class SlotView @JvmOverloads constructor(
     /*  Log.d("TAG_MY", "previousWasFinished = $previousWasFinished circle = $circle")
                 Log.d("TAG_MY", "finish value = $finishValue number = $number")*/
 
-    private fun nextCircle() {
-        circle++
-        startLot()
-    }
 
-    private fun finishSlot() {
-        finishValue = 0
+    private fun finishLot() {
         circle = 0
         setText(text, number)
         eventListener?.end(this@SlotView)
