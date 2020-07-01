@@ -38,7 +38,9 @@ class SlotView @JvmOverloads constructor(
     }
 
     companion object {
-        private const val ANIM_DURATION = 400L
+              private const val MAX_ANIM_DURATION = 400L
+              private const val MIN_ANIM_DURATION = 550L
+
         private const val MIN_CIRCLES = 1
     }
 
@@ -59,30 +61,35 @@ class SlotView @JvmOverloads constructor(
         else number++
 
 
-        text.animate().translationY(-height.toFloat()).setDuration(ANIM_DURATION).start()
+        val speed = if (circle > 0 && previousWasFinished) MIN_ANIM_DURATION else MAX_ANIM_DURATION
 
-        nextText.translationY = nextText.height.toFloat()
 
-        nextText.animate().translationY(0F).setDuration(ANIM_DURATION).setListener(object :
-            Animator.AnimatorListener {
-            override fun onAnimationRepeat(animator: Animator) {
-            }
+        text.animate().translationY(-height.toFloat()).setDuration(speed).start()
+        setText(nextText, number)
 
-            override fun onAnimationEnd(animator: Animator) {
-                setText(text, number)
-                text.translationY = 0F
-                if (circle > MIN_CIRCLES && previousWasFinished && finishValue == number) finishSlot()
-                else startSlot()
+        nextText.translationY = (nextText.height * 2).toFloat()
+        nextText.animate()
+            .translationY(0F)
+            .setDuration(speed)
+            .setListener(object : Animator.AnimatorListener {
+                override fun onAnimationRepeat(animator: Animator) {
+                }
 
-            }
+                override fun onAnimationEnd(animator: Animator) {
+                    setText(text, number)
+                    text.translationY = 0F
+                    if (circle > MIN_CIRCLES && previousWasFinished && finishValue == number) finishSlot()
+                    else startSlot()
 
-            override fun onAnimationCancel(animator: Animator) {
-            }
+                }
 
-            override fun onAnimationStart(animator: Animator) {
-            }
+                override fun onAnimationCancel(animator: Animator) {
+                }
 
-        })
+                override fun onAnimationStart(animator: Animator) {
+                }
+
+            })
     }
 
     /*  Log.d("TAG_MY", "previousWasFinished = $previousWasFinished circle = $circle")

@@ -22,10 +22,10 @@ class MainActivity : AppCompatActivity(), EventListener {
             val second = random / 10 % 10
             val third = random % 10
 
-            generateRandom(first_lot, first)
+            generateSlot(first_lot, first)
             first_lot.previousWasFinished = true
-            generateRandom(second_lot, second)
-            generateRandom(third_lot, third)
+            generateSlot(second_lot, second)
+            generateSlot(third_lot, third)
 
         }
 
@@ -35,7 +35,7 @@ class MainActivity : AppCompatActivity(), EventListener {
 
     }
 
-    private fun generateRandom(slotView: SlotView, finishValue: Int) {
+    private fun generateSlot(slotView: SlotView, finishValue: Int) {
         slotView.finishValue = finishValue
         slotView.startSlot()
     }
