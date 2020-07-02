@@ -11,48 +11,6 @@ class MainActivity : AppCompatActivity(), EventListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
-
-
-        start_btn.setOnClickListener {
-
-            val random = Random().nextInt(900) + 100
-
-            val first = random / 100 % 10
-            val second = random / 10 % 10
-            val third = random % 10
-
-            generateSlot(first_lot, first)
-            first_lot.previousWasFinished = true
-            generateSlot(second_lot, second)
-            generateSlot(third_lot, third)
-
-        }
-
-        first_lot.setEventListener(this)
-        second_lot.setEventListener(this)
-        third_lot.setEventListener(this)
-
-    }
-
-    private fun generateSlot(slotView: SlotView, finishValue: Int) {
-        slotView.finishValue = finishValue
-        slotView.startSlot()
-    }
-
-    override fun end(slot: SlotView) {
-
-        if (slot == first_lot) second_lot.previousFinished()
-
-
-        if (slot == second_lot)  third_lot.previousFinished()
-
-
-        if (slot == third_lot) {
-            third_lot.previousWasFinished = false
-            second_lot.previousWasFinished = false
-        }
-
-
+        start_btn.setOnClickListener { slotMachine.start() }
     }
 }

@@ -1,4 +1,4 @@
-package com.example.slot
+package com.example.slot.machine.slot
 
 import android.animation.Animator
 import android.content.Context
@@ -6,12 +6,9 @@ import android.util.AttributeSet
 import android.view.View
 import android.widget.FrameLayout
 import androidx.appcompat.widget.AppCompatTextView
-import kotlinx.android.synthetic.main.text_view_scrolling.view.*
+import com.example.slot.R
+import kotlinx.android.synthetic.main.slot_view.view.*
 import java.util.*
-
-interface EventListener {
-    fun end(slot: SlotView)
-}
 
 
 class SlotView @JvmOverloads constructor(
@@ -21,7 +18,7 @@ class SlotView @JvmOverloads constructor(
     private var text: AppCompatTextView
     private var nextText: AppCompatTextView
 
-    var finishValue: Int = 0
+    private var finishValue: Int = 0
     var previousWasFinished = false
     private var circle = 0
 
@@ -29,29 +26,32 @@ class SlotView @JvmOverloads constructor(
 
     private var circleCounter = mutableSetOf<Int>()
 
+    companion object {
+        private const val MAX_ANIM_DURATION = 400L
+        private const val MIN_ANIM_DURATION = 550L
+        private const val MIN_CIRCLES = 1
+    }
+
     init {
-        val view = View.inflate(context, R.layout.text_view_scrolling, this)
+        val view = View.inflate(context, R.layout.slot_view, this)
         text = view.text_lbl
         nextText = view.next_text_lbl
         number = Random().nextInt(9)
         text.text = number.toString()
     }
 
-    companion object {
-              private const val MAX_ANIM_DURATION = 400L
-              private const val MIN_ANIM_DURATION = 550L
-
-        private const val MIN_CIRCLES = 1
-    }
+    private var eventListener: SlotEventListener? = null
 
 
-    private var eventListener: EventListener? = null
-
-    fun setEventListener(eventListener: EventListener) {
+    fun init(slotOptions: SlotOptions, eventListener: SlotEventListener) {
+        this.finishValue = slotOptions.finishValue
+        this.previousWasFinished = slotOptions.isPreviousWasFinished
         this.eventListener = eventListener
+        startSlot()
     }
 
-    fun startSlot() {
+
+    private fun startSlot() {
 
         if (!circleCounter.contains(number)) circleCounter.add(number)
         else circle++
@@ -92,14 +92,10 @@ class SlotView @JvmOverloads constructor(
             })
     }
 
-    /*  Log.d("TAG_MY", "previousWasFinished = $previousWasFinished circle = $circle")
-                Log.d("TAG_MY", "finish value = $finishValue number = $number")*/
-
-
     private fun finishSlot() {
         clearCircle()
         setText(text, number)
-        eventListener?.end(this@SlotView)
+        eventListener?.end(this@SlotView, number)
     }
 
     private fun setText(text: AppCompatTextView, value: Int) {
